@@ -1,11 +1,12 @@
 name: release
 
-# Build standalone `celeborn` binaries for macOS (arm64 + x86_64) on a version tag, then attach them
-# to the GitHub Release. Homebrew/Scoop/winget manifests point at these assets.
+# Build standalone `celeborn` binaries on a version tag, then attach them to the GitHub Release.
+# Homebrew/Scoop/winget manifests point at these assets.
 #
-# Windows is intentionally NOT built yet — no Windows tester on hand to validate it. The build path
-# (packaging/build-binary.ps1) and the winget manifests stay in the tree; re-add the windows-latest
-# matrix entry below when there's someone to test the .exe.
+# Targets: macOS arm64 (Apple Silicon) + Windows x86_64. macOS Intel (x86_64) is deferred — the
+# macos-13 GitHub-hosted runner is queue-starved in this org and stalled the release; Intel-mac users
+# install via the uv/curl path until a runner is available (re-add the macos-13 matrix entry then).
+# The Windows .exe is UNSIGNED (no Authenticode cert wired) — SmartScreen shows "unknown publisher".
 #
 # Tag to release:  git tag v0.1.0 && git push origin v0.1.0
 #
@@ -27,12 +28,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: macos-14      # Apple silicon (arm64)
+          - os: macos-14        # Apple silicon (arm64)
             asset: celeborn-macos-arm64
             ext: ""
-          - os: macos-13      # Intel (x86_64)
-            asset: celeborn-macos-x86_64
-            ext: ""
+          - os: windows-latest  # Windows (x86_64)
+            asset: celeborn-windows-x86_64
+            ext: ".exe"
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -40,8 +41,13 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Build binary
+      - name: Build binary (unix)
+        if: runner.os != 'Windows'
         run: bash packaging/build-binary.sh
+      - name: Build binary (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./packaging/build-binary.ps1
 
       - name: Stage + checksum
         shell: bash
