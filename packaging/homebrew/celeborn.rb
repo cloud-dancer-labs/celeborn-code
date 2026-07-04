@@ -5,8 +5,12 @@
 #     brew install cloud-dancer-labs/celeborn/celeborn
 #
 # The release workflow builds per-arch binaries and prints their sha256 (the *.sha256 sidecars);
-# bump `version`, the URLs, and the four `sha256` values on each release (the bump can be automated
+# bump `version`, the URLs, and the `sha256` value on each release (the bump can be automated
 # from the Release assets). Cask vs. formula: a single-binary CLI is a formula.
+#
+# Apple Silicon only for now — the Intel-mac (x86_64) binary is deferred until a macos-13 CI runner
+# is available (see .github/workflows/release.yml). Intel-mac users install via `uv tool install`
+# or the curl|sh path. Re-add the on_intel block when celeborn-macos-x86_64 ships.
 
 class Celeborn < Formula
   desc "Long-term context substrate for coding agents (CLI)"
@@ -17,11 +21,7 @@ class Celeborn < Formula
   on_macos do
     on_arm do
       url "https://github.com/cloud-dancer-labs/celeborn/releases/download/v#{version}/celeborn-macos-arm64"
-      sha256 "REPLACE_WITH_ARM64_SHA256"
-    end
-    on_intel do
-      url "https://github.com/cloud-dancer-labs/celeborn/releases/download/v#{version}/celeborn-macos-x86_64"
-      sha256 "REPLACE_WITH_X86_64_SHA256"
+      sha256 "d436b94c9ae0eb71a53b53470a006401b38abcc86695c36fe118fb6f193ee3dc"
     end
   end
 
