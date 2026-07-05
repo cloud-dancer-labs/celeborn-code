@@ -12,22 +12,19 @@ place across days or weeks — instead of degrading as the context window fills 
 
 ## Install
 
-**One paste — then your agent does the rest.** From inside your project folder:
+**Two commands.** Install the CLI, then run it from inside your project folder:
 
 ```bash
-curl -fsSL https://celeborn.thot.ai/install | sh
+uv tool install celeborn        # the `celeborn` command — macOS, Windows, and Linux
+celeborn init                   # wires the hooks, scaffolds the project, and opens your board
 ```
 
-On **Windows (PowerShell):** `irm https://celeborn.thot.ai/install.ps1 | iex`
+No [uv](https://docs.astral.sh/uv/)? `pip install celeborn` works too. Then open your AI coding tool
+— **Claude Code, Codex, or Grok** — in that project and just say hi: Celeborn orients itself, asks
+what you want to build, and remembers everything from there.
 
-That one line installs the `celeborn` command (bootstrapping [uv](https://docs.astral.sh/uv/) if you
-don't have it — works on **macOS, Windows, and Linux**) and runs `celeborn setup` in the current
-folder to wire the hooks and scaffold the project. Then open your AI coding tool — **Claude Code,
-Codex, or Grok** — in that project and just say hi: Celeborn orients itself, asks what you want to
-build, and remembers everything from there.
-
-<sub>Prefer not to pipe a script into your shell? Install via uv / Homebrew / winget in the
-**Install — manual &amp; advanced** section below — every path ends at the same `celeborn setup`.</sub>
+<sub>Prefer Homebrew or winget? See the **Install — manual &amp; advanced** section below — every
+path ends at the same `celeborn init`.</sub>
 
 ---
 
@@ -141,21 +138,21 @@ brew install cloud-dancer-labs/celeborn/celeborn                        # macOS
 winget install ThotTechnologies.Celeborn                         # Windows (or: scoop — see below)
 uv tool install git+https://github.com/cloud-dancer-labs/celeborn.git   # any OS (uv or pip)
 
-# 2 — one guided setup: wires your coding agent, scaffolds this project, signs you in (browser)
+# 2 — one guided command: wires your coding agent, scaffolds this project, signs you in, opens your board
 cd your-project
-celeborn setup
+celeborn init
 ```
 
-That's the whole first run. `celeborn setup` does the hook wiring (`wire --global`), the per-project
-scaffold (`init` — which also writes the `AGENTS.md` + Grok rules Codex/Grok auto-load), and a browser
-sign-in (`login --github`) in one pass, then prints where your board is. It's **idempotent and
-resumable** — re-run it any time and it skips the steps already done. Useful flags: `--no-login` (purely
-local-first, skip the account), `--project` (wire just this repo, not `~/.claude`), `--name "<name>"` /
-`--no-open` (passed to `init`), `--no-skills` / `--no-permission-baseline` (passed to `wire`). **Grok
+That's the whole first run. **`celeborn init` is the one command** — it does the hook wiring
+(`wire --global`), the per-project scaffold (which also writes the `AGENTS.md` + Grok rules Codex/Grok
+auto-load), a browser sign-in (`login --github`), and then opens your kanban board — in one pass. It's
+**idempotent and resumable** — re-run it any time and it skips the steps already done. Useful flags:
+`--no-login` (purely local-first, skip the account), `--project` (wire just this repo, not `~/.claude`),
+`--name "<name>"` / `--no-open` (board), `--no-skills` / `--no-permission-baseline` (wiring). **Grok
 users:** for Grok's full hooks (not just project rules) also run `bash grok/scripts/install.sh` (see
-[Grok Build](#grok-build)). Run `celeborn setup --help` for the full list.
+[Grok Build](#grok-build)). Run `celeborn init --help` for the full list.
 
-Everything below is the **detailed / manual breakdown** of what `setup` runs — read it when you want to
+Everything below is the **detailed / manual breakdown** of what `init` runs — read it when you want to
 run the pieces by hand, wire CI, or tune the defaults.
 
 #### Manual / advanced — the individual steps
