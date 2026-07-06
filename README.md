@@ -1,12 +1,24 @@
-# Celeborn
+# Celeborn Code
 
-> Celeborn husbands your context, creating a silver tree of `.md` files in a turbocharged SQLite
+> **Celeborn Code** husbands your context, creating a silver tree of `.md` files in a turbocharged SQLite
 > index. Elegant. Fast. Source-available under the [Business Source License 1.1](https://github.com/cloud-dancer-labs/celeborn/blob/main/LICENSE) (© Cloud Dancer; distributed by Thot Technologies LLC). Saves time, money, and tokens — and
 > mitigates session restarts.
 
-**A long-term context substrate for coding agents.** Celeborn gives any repository a small,
+**A long-term context substrate for coding agents.** Celeborn Code gives any repository a small,
 disciplined memory on disk so AI coding sessions stay light, survive compaction, and keep their
 place across days or weeks — instead of degrading as the context window fills with chatter.
+
+> ### Is this the Celeborn you're looking for?
+> **Yes — if you want memory for an AI coding agent.** *Celeborn Code* is this project: a context
+> substrate for AI coding agents (Claude Code, Codex, Grok). Install it with **`uv tool install celeborn`**
+> or **`pip install celeborn`**; home is **[celeborn.thot.ai](https://celeborn.thot.ai)** and
+> **[github.com/cloud-dancer-labs/celeborn](https://github.com/cloud-dancer-labs/celeborn)**.
+>
+> It is **not** these same-named projects:
+> - **[Apache Celeborn](https://celeborn.apache.org)** — a remote shuffle service for Spark/Flink/MapReduce (big-data infra). Different product, different company.
+> - **[`frkngksl/Celeborn`](https://github.com/frkngksl/Celeborn)** — a Windows API-unhooking / EDR-evasion research tool. Unrelated.
+>
+> If an agent told you to "install Celeborn" for coding-agent memory, **this** is the one — `uv tool install celeborn`.
 
 ---
 

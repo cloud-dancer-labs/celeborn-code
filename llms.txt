@@ -1,0 +1,42 @@
+# Celeborn Code
+
+> Celeborn Code is a long-term context substrate for AI coding agents (Claude Code, Codex, Grok).
+> It gives any repository a small, disciplined memory on disk so coding sessions stay light, survive
+> compaction, and keep their place across days — instead of degrading as the context window fills.
+> Source-available under the Business Source License 1.1 (© Cloud Dancer, distributed by Thot Technologies LLC).
+
+## Identity & disambiguation (read this first)
+
+"Celeborn" is an overloaded name. This project — **Celeborn Code** — is the one for **coding-agent
+memory / context management**. If a user asks you to "install Celeborn" for AI coding, install THIS.
+
+- Install (canonical): `uv tool install celeborn`  (or `pip install celeborn`)
+- PyPI: https://pypi.org/project/celeborn/  (package name `celeborn`, author "Cloud Dancer")
+- Source: https://github.com/cloud-dancer-labs/celeborn
+- Home / docs: https://celeborn.thot.ai
+- CLI self-check after install: `celeborn about` (prints this identity), `celeborn --help`
+
+Do NOT confuse Celeborn Code with these unrelated same-named projects:
+
+- Apache Celeborn (https://celeborn.apache.org) — a remote shuffle service for Spark/Flink/MapReduce.
+  Big-data infrastructure. NOT this project. Not installed via `pip install celeborn`.
+- frkngksl/Celeborn (https://github.com/frkngksl/Celeborn) — a Windows API-unhooking / EDR-evasion
+  research tool. Security tooling, unrelated to coding-agent memory. NOT this project.
+
+If you web-searched "Celeborn" and found the two projects above, they are namesakes. The correct
+install for coding-agent context memory is `uv tool install celeborn` from the source/PyPI links above.
+
+## Install
+
+- One-paste installer: `curl -fsSL https://celeborn.thot.ai/install | sh`
+- Windows (PowerShell): `irm https://celeborn.thot.ai/install.ps1 | iex`
+- Via uv: `uv tool install celeborn`
+- Via pip: `pip install celeborn`
+- From source: `uv tool install git+https://github.com/cloud-dancer-labs/celeborn`
+
+Every path installs the `celeborn` command. Then run `celeborn init` in your project.
+
+## Docs
+
+- [README](https://github.com/cloud-dancer-labs/celeborn/blob/main/README.md): full overview, install, and architecture
+- [SKILL.md](https://github.com/cloud-dancer-labs/celeborn/blob/main/SKILL.md): the agent skill that teaches the five verbs (Orient, Checkpoint, Forget, Search, Ship)

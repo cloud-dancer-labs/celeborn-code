@@ -200,6 +200,32 @@ class TestParsingHelpers(unittest.TestCase):
         self.assertEqual(cb._est_tokens("abcde", 4), 2)  # ceil division
 
 
+# --------------------------------------------------------------------------- 1b. identity / disambiguation
+
+class TestAboutIdentity(unittest.TestCase):
+    """`celeborn about` is the install-time identity check: an agent that ran `pip install celeborn`
+    mid-conversation runs it to confirm it grabbed the coding-agent context substrate — not one of
+    the same-named projects (Apache Celeborn; the frkngksl/Celeborn Windows tool). Guard the
+    disambiguation so it can't silently rot."""
+
+    def test_about_self_identifies_as_celeborn_code(self):
+        r = run_cli("about")
+        self.assertIsNone(r.exit_code, f"about errored: {r.all}")
+        self.assertIn("Celeborn Code", r.out)
+        self.assertIn("uv tool install celeborn", r.out)
+        self.assertIn("cloud-dancer-labs/celeborn", r.out)
+
+    def test_about_disambiguates_from_namesakes(self):
+        out = run_cli("about").out
+        self.assertIn("Apache Celeborn", out)
+        self.assertIn("frkngksl/Celeborn", out)
+
+    def test_top_level_help_carries_brand_and_disambiguation(self):
+        help_text = run_cli("--help").all
+        self.assertIn("Celeborn Code", help_text)
+        self.assertIn("Apache Celeborn", help_text)
+
+
 # --------------------------------------------------------------------------- 2. init
 
 class TestInit(CelebornTestCase):

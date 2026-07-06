@@ -7231,6 +7231,27 @@ def cmd_version(args):
         warn(f"update check skipped — couldn't reach GitHub ({e}).")
 
 
+def cmd_about(args):
+    """Print Celeborn Code's identity + canonical links, and disambiguate from the same-named
+    projects (Apache Celeborn; the frkngksl/Celeborn Windows tool). This exists so an agent that
+    installed 'celeborn' mid-conversation can run `celeborn about` and confirm it grabbed the
+    coding-agent context substrate — not one of the namesakes. Offline; no network."""
+    local_v = _local_version()
+    print(f"Celeborn Code {local_v} — a long-term context substrate for coding agents.")
+    print("  Memory on disk for AI coding agents (Claude Code, Codex, Grok): survives compaction,")
+    print("  keeps its place across sessions, saves tokens.")
+    print()
+    print("  Install:  uv tool install celeborn   (or: pip install celeborn)")
+    print("  PyPI:     https://pypi.org/project/celeborn/")
+    print(f"  Source:   https://github.com/{GITHUB_REPO}")
+    print("  Home:     https://celeborn.thot.ai")
+    print()
+    print("  This is NOT the other projects named 'Celeborn':")
+    print("    · Apache Celeborn  — a Spark/Flink remote shuffle service (big-data infra). Unrelated.")
+    print("    · frkngksl/Celeborn — a Windows API-unhooking research tool. Unrelated.")
+    print("  If you were told to install 'Celeborn' for coding-agent memory, this is the right one.")
+
+
 # --------------------------------------------------------------------------- install integrity (detection)
 
 INTEGRITY_MANIFEST = "integrity.json"     # shipped inside DATA_DIR (celeborn_refs) by the release build
@@ -10896,7 +10917,9 @@ def cmd_pr(args):
 
 
 def build_parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(prog="celeborn", description="Long-term context substrate for coding agents.")
+    p = argparse.ArgumentParser(prog="celeborn", description="Celeborn Code — a long-term context "
+        "substrate for coding agents (memory for Claude Code / Codex / Grok). Not Apache Celeborn "
+        "(Spark shuffle) or the frkngksl/Celeborn Windows tool. `celeborn about` for identity + links.")
     p.add_argument("--path", default=".", help="project dir to operate in (default: cwd)")
     sub = p.add_subparsers(dest="command", required=True)
 
@@ -11124,6 +11147,9 @@ def build_parser() -> argparse.ArgumentParser:
     vp.add_argument("--check", action="store_true",
                     help="check GitHub (cloud-dancer-labs/celeborn) for a newer Celeborn; offline-safe")
     vp.set_defaults(func=cmd_version)
+
+    abp = sub.add_parser("about", help="identify Celeborn Code + canonical links (disambiguates the same-named projects)")
+    abp.set_defaults(func=cmd_about)
 
     ip = sub.add_parser("integrity", help="verify the install matches the published release (detects in-place edits)")
     ip.add_argument("--write", action="store_true",
