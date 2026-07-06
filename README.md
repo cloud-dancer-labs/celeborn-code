@@ -1,8 +1,7 @@
 # Celeborn Code
 
-> **Celeborn Code** husbands your context, creating a silver tree of `.md` files in a turbocharged SQLite
-> index. Elegant. Fast. Source-available under the [Business Source License 1.1](https://github.com/cloud-dancer-labs/celeborn/blob/main/LICENSE) (© Cloud Dancer; distributed by Thot Technologies LLC). Saves time, money, and tokens — and
-> mitigates session restarts.
+> Celeborn Code — persistent context and a multi-agent kanban for AI coding agents ([celeborncode.ai](https://celeborncode.ai)).
+> Source-available under the [Business Source License 1.1](https://github.com/cloud-dancer-labs/celeborn/blob/main/LICENSE) (© Cloud Dancer; distributed by Thot Technologies LLC). Saves time, money, and tokens — and mitigates session restarts.
 
 **A long-term context substrate for coding agents.** Celeborn Code gives any repository a small,
 disciplined memory on disk so AI coding sessions stay light, survive compaction, and keep their
