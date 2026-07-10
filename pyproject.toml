@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "celeborn-code"
 version = "0.2.1"
-description = "A long-term context substrate for coding agents."
+description = "Persistent memory for AI coding agents — works with Claude Code, Cursor, Codex, ChatGPT, Grok Build, and other AI coding assistants. A long-term context substrate on disk plus a multi-agent kanban board: sessions survive compaction, restarts, and /clear, and stop re-explaining the project. Installs the `celeborn` command."
 readme = "README.md"
 # Source-available under the Business Source License 1.1 (SPDX: BUSL-1.1). Converts to Apache-2.0
 # four years after each version's release. Full terms + Additional Use Grant in the LICENSE file.
@@ -14,7 +14,12 @@ license-files = ["LICENSE"]
 requires-python = ">=3.9"
 authors = [{ name = "Cloud Dancer" }]
 maintainers = [{ name = "Thot Technologies LLC" }]
-keywords = ["llm", "agents", "memory", "context", "claude", "coding-agents"]
+keywords = [
+    "llm", "agents", "memory", "context", "claude", "coding-agents",
+    "claude-code", "cursor", "codex", "chatgpt", "grok", "ai-coding", "agent-memory",
+    "persistent-memory", "context-window", "context-management", "kanban", "multi-agent",
+    "developer-tools",
+]
 classifiers = [
     # NOTE: No "License ::" trove classifier here — PEP 639 forbids pairing a License-Expression
     # (the `license = "BUSL-1.1"` above) with a License classifier. PyPI renders BUSL-1.1 from the
