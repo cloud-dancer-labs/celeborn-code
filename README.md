@@ -161,7 +161,7 @@ auto-load), a sign-in (`login` — email + password; GitHub linkable afterwards)
 **idempotent and resumable** — re-run it any time and it skips the steps already done. Useful flags:
 `--no-login` (purely local-first, skip the account), `--project` (wire just this repo, not `~/.claude`),
 `--name "<name>"` / `--no-open` (board), `--no-skills` / `--no-permission-baseline` (wiring). **Grok
-users:** for Grok's full hooks (not just project rules) also run `bash grok/scripts/install.sh` (see
+users:** for Grok's full hooks (not just project rules) also run `celeborn grok wire` (see
 [Grok Build](#grok-build)). Run `celeborn init --help` for the full list. *(Only need the per-project
 files, agent already wired? `celeborn scaffold` does just the scaffold step.)*
 
@@ -546,18 +546,19 @@ With deep gratitude to the Father of Elves — go star
 ## Grok Build
 
 Celeborn also runs under **[Grok Build](https://x.ai)**. Grok has its own hook format and doesn't feed
-`SessionStart` output to the model, so a thin adapter under [`grok/`](grok/) bridges it to the stock
-`celeborn` CLI — it converts Grok transcripts for `celeborn capture`, reads token usage for the
-reminders, and writes the Orient load to `.context/.grok-orient-pending.md` (read once per session, then
-deleted). **Celeborn core is untouched** — `grok/` is a host overlay, the same way Elves is a
-workflow overlay. One command:
+`SessionStart` output to the model, so a thin host adapter bridges it to the stock `celeborn` CLI — it
+converts Grok transcripts for `celeborn capture`, reads token usage for the reminders, and writes the
+Orient load to `.context/.grok-orient-pending.md` (read once per session, then deleted). **Celeborn
+core is untouched** — the adapter is a host overlay, and it ships **inside** the `celeborn` binary
+itself, so there is nothing extra to download. One command:
 
 ```bash
-bash grok/scripts/install.sh --project /path/to/your-project
+celeborn grok wire
 ```
 
 Global hooks then load on every new Grok session — no manual reload (mid-session installs just need
-`/clear` once). See [`grok/SKILL.md`](grok/SKILL.md).
+`/clear` once). The adapter's skill installs to `~/.grok/skills/celeborn-grok/` (its `SKILL.md`
+documents the per-session orient protocol).
 
 ## Standing on the shoulders of giants
 
