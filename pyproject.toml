@@ -4,11 +4,15 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "celeborn-code"
-version = "0.2.1"
+version = "0.3.0"
 description = "Persistent memory for AI coding agents — works with Claude Code, Cursor, Codex, ChatGPT, Grok Build, and other AI coding assistants. A long-term context substrate on disk plus a multi-agent kanban board: sessions survive compaction, restarts, and /clear, and stop re-explaining the project. Installs the `celeborn` command."
 readme = "README.md"
-# Source-available under the Business Source License 1.1 (SPDX: BUSL-1.1). Converts to Apache-2.0
-# four years after each version's release. Full terms + Additional Use Grant in the LICENSE file.
+# This package is the THIN INSTALLER (BUSL 1.1 — SPDX: BUSL-1.1; converts to Apache-2.0 four years
+# after each version's release; full terms + Additional Use Grant + Supplemental Terms in LICENSE).
+# The Celeborn client itself ships as a compiled binary (all rights reserved) that this installer
+# downloads and sha256-verifies from https://github.com/cloud-dancer-labs/celeborn-releases.
+# Versions <= 0.2.1 of this package shipped full BUSL source; they remain so on PyPI and in git
+# history, and hit their Change Date (-> Apache-2.0) on schedule.
 license = "BUSL-1.1"
 license-files = ["LICENSE"]
 requires-python = ">=3.9"
@@ -32,7 +36,7 @@ classifiers = [
     "Operating System :: OS Independent",
     "Topic :: Software Development :: Libraries",
 ]
-dependencies = []  # stdlib only (argparse, sqlite3, json, pathlib) — "boring technology"
+dependencies = []  # stdlib only — the installer is one file with no imports beyond the standard library
 
 [project.urls]
 Homepage = "https://celeborncode.ai"
@@ -44,48 +48,7 @@ celeborn = "celeborn:main"
 cel = "celeborn:main"
 
 [tool.setuptools]
-# The CLI is a set of flat modules under scripts/ (single-file ethos preserved). celeborn.py is the
-# entrypoint; the celeborn_* siblings are runtime-imported (`__import__("celeborn_jira")` etc.), so
-# EVERY module celeborn.py can reach must be listed here or the installed wheel raises
-# ModuleNotFoundError the moment a user without the dev checkout runs e.g. `celeborn jira status`
-# (CELE-t335). Keep this list in sync with `ls scripts/celeborn_*.py`.
-# Runtime data (schema.sql + init templates) lives in references/ and ships as the data-only
-# `celeborn_refs` package so wheels/uv-tool installs carry it; celeborn.py resolves it via
-# importlib.resources.
-package-dir = { "" = "scripts", "celeborn_refs" = "references" }
-py-modules = [
-    "celeborn",             # CLI entrypoint (celeborn:main)
-    "celeborn_sync",        # hosted push/pull, register/login/whoami, redact
-    "celeborn_jira",        # Jira external-tracker mirror (celeborn jira …)
-    "celeborn_github",      # GitHub Issues mirror (celeborn github …) — CELE-t214
-    "celeborn_config",      # machine/project config surface (celeborn config …)
-    "celeborn_cmm",         # CMM (credited metering / provenance)
-    "celeborn_cmm_provision",  # CMM Sprint 2 provisioning + upstream tracking
-    "celeborn_secrets",     # encrypted secrets vault (celeborn secrets …)
-]
-packages = ["celeborn_refs"]
-
-[tool.setuptools.package-data]
-# Explicit keep-list, not a wildcard: references/ also holds contributor-facing design docs, and a
-# wildcard shipped every stray plan in the wheel. Only runtime data (schema, pins, init templates)
-# and the docs the CLI points users at belong here — a new reference doc does NOT ship unless
-# deliberately added.
-celeborn_refs = [
-    "VERSION",              # baked by the release build when present
-    "integrity.json",       # baked by the release build when present
-    "schema.sql",
-    "cmm-pin.json",
-    "infisical-pin.json",
-    "weave-pin.json",
-    "memory-protocol.md",   # PANIC_READ_MORE — printed in the panic-save line
-    "metrics.md",
-    "multi-agent-editing.md",  # printed by `celeborn touch` + written into rules files at init
-    "rehydration.md",
-    "reminders.md",
-    "supabase-auth-setup.md",  # printed in sync error messages
-    "supabase-setup.md",       # printed in sync error messages
-    "tiers.md",
-    "weave-contract.md",    # prose contract behind weave-pin.json
-    "templates/*",
-    "templates/**/*",
-]
+# The whole package is the single thin-installer module at the repo root: it resolves the platform,
+# downloads the version-pinned binary tarball from celeborn-releases, verifies its sha256 against
+# the checksums stamped into the module, places the binary under ~/.celeborn/bin, and execs it.
+py-modules = ["celeborn"]

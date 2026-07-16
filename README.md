@@ -125,7 +125,7 @@ Markdown is the source of truth (git-diffable, human- and model-readable). The S
 design choice is what makes a Celeborn project *portable*: the truth is plain text that travels in
 git, and the fast path rebuilds itself anywhere in milliseconds.
 
-The agent works five verbs, taught by the bundled skill ([`SKILL.md`](SKILL.md)):
+The agent works five verbs, taught by the bundled skill:
 **Orient** (cheap rehydration) · **Checkpoint** (write current state) · **Forget** (archive/prune to
 keep Hot small) · **Promote** (distill `journal → learnings → durable`) · **Handoff** (a tiny resume
 prompt so a fresh thread can pick up where the last died).
@@ -148,7 +148,7 @@ so nothing fires.
 # 1 — install the command (pick your platform)
 brew install cloud-dancer-labs/celeborn/celeborn                        # macOS
 winget install ThotTechnologies.Celeborn                         # Windows (or: scoop — see below)
-uv tool install git+https://github.com/cloud-dancer-labs/celeborn-code.git   # any OS (uv or pip)
+uv tool install celeborn-code                                    # any OS (or: pip install celeborn-code)
 
 # 2 — one guided command: wires your coding agent, scaffolds this project, signs you in, opens your board
 cd your-project
@@ -157,7 +157,7 @@ celeborn init
 
 That's the whole first run. **`celeborn init` is the one command** — it does the hook wiring
 (`wire --global`), the per-project scaffold (which also writes the `AGENTS.md` + Grok rules Codex/Grok
-auto-load), a browser sign-in (`login --github`), and then opens your kanban board — in one pass. It's
+auto-load), a sign-in (`login` — email + password; GitHub linkable afterwards), and then opens your kanban board — in one pass. It's
 **idempotent and resumable** — re-run it any time and it skips the steps already done. Useful flags:
 `--no-login` (purely local-first, skip the account), `--project` (wire just this repo, not `~/.claude`),
 `--name "<name>"` / `--no-open` (board), `--no-skills` / `--no-permission-baseline` (wiring). **Grok
@@ -180,17 +180,17 @@ brew install cloud-dancer-labs/celeborn/celeborn
 winget install ThotTechnologies.Celeborn
 #   …or:  scoop bucket add celeborn https://github.com/cloud-dancer-labs/scoop-celeborn && scoop install celeborn
 
-# Any OS with a Python toolchain — uv (recommended), straight from GitHub:
-uv tool install git+https://github.com/cloud-dancer-labs/celeborn-code.git
-
-# …or editable from a local clone — best if you'll hack on Celeborn, since the command then tracks
-# your working tree (no reinstall after each change):
-git clone https://github.com/cloud-dancer-labs/celeborn-code.git ~/celeborn
-uv tool install --editable ~/celeborn          # or:  pip install -e ~/celeborn
+# Any OS with a Python toolchain — uv (recommended) or pip:
+uv tool install celeborn-code        # or:  pip install celeborn-code
 ```
 
-The Homebrew/winget/Scoop installs are **standalone native binaries** (no Python required) — see
-[`packaging/README.md`](packaging/README.md). Verify it's on your PATH: `celeborn version`.
+Every path delivers the same **compiled Celeborn binary**. Homebrew/winget/Scoop fetch it straight
+from the release; the PyPI package is a **thin installer** — the one small module in this repository —
+that on first run downloads the version-pinned tarball from
+[`celeborn-releases`](https://github.com/cloud-dancer-labs/celeborn-releases/releases), verifies its
+sha256 against the checksum baked in at release time, and places the binary under `~/.celeborn/bin/`
+(a mismatched download is never placed). Verify it's on your PATH: `celeborn version` — and
+`celeborn --installer-info` shows what the installer resolved without touching the network.
 
 **2 — Wire the hooks into Claude Code** (once). The easy way — run it from your clone:
 
@@ -228,9 +228,8 @@ prose, not installable skills. The board's **Settings** page (the ⚙️ on the 
 skills (with an Update button + last-refresh), which auto-allows are active, and a red **Danger Zone**
 to toggle the full (unsafe) auto-allow spectrum.
 
-Prefer it over hand-editing — but you can still merge
-[`hooks/settings.snippet.json`](hooks/settings.snippet.json) into `~/.claude/settings.json` manually if
-you'd rather:
+Prefer it over hand-editing — but if you'd rather own `~/.claude/settings.json` yourself, run
+`celeborn wire` once and take over the managed block it writes:
 
 ```jsonc
 { "statusLine": { "type": "command", "command": "celeborn hook statusline" },
@@ -301,14 +300,10 @@ installed, Celeborn still pre-clears what it can and degrades gracefully — it 
 and reminds you to install CMM for the structural half.
 
 > **Keep the CLI current.** A stale install silently shadows newer hooks and skips features. If you
-> installed from GitHub, run `uv tool upgrade celeborn` after Celeborn updates; an `--editable` install
-> avoids the problem entirely (it tracks your clone live). Check anytime with `celeborn version --check`.
+> installed via uv/pip, run `uv tool upgrade celeborn-code` (or `pip install -U celeborn-code`) after
+> Celeborn updates; Homebrew/winget/Scoop upgrade the usual way. Check anytime with `celeborn version --check`.
 
 ## Quickstart
-
-> **No-install option:** every command below also runs as `python3 /path/to/celeborn/scripts/celeborn.py
-> <cmd>` without installing anything — handy for a quick look. For real use, do the one-time [Install](#install)
-> above so the hooks work, then it's just `celeborn <cmd>`.
 
 > **Your memory is always private — never in git.** `.context/` holds your prompts, notes, and working
 > memory, so Celeborn **always gitignores it** — there is no option to commit it. (Committing it to a repo
@@ -318,29 +313,26 @@ and reminds you to install CMM for the structural half.
 
 ```bash
 # from your project root
-python3 /path/to/celeborn/scripts/celeborn.py scaffold  # scaffold .context/ (always gitignored/private)
-python3 /path/to/celeborn/scripts/celeborn.py status   # what an agent loads on Orient
-python3 /path/to/celeborn/scripts/celeborn.py index    # build the search index
-python3 /path/to/celeborn/scripts/celeborn.py search "that decision about auth"
-python3 /path/to/celeborn/scripts/celeborn.py doctor   # health check + secret scan
-python3 /path/to/celeborn/scripts/celeborn.py integrity # verify the install matches the published release
-python3 /path/to/celeborn/scripts/celeborn.py metrics  # estimated tokens saved + restarts avoided
-python3 /path/to/celeborn/scripts/celeborn.py version --check  # is a newer Celeborn on GitHub?
+celeborn scaffold        # scaffold .context/ (always gitignored/private)
+celeborn status          # what an agent loads on Orient
+celeborn index           # build the search index
+celeborn search "that decision about auth"
+celeborn doctor          # health check + secret scan
+celeborn integrity       # verify the install matches the published release
+celeborn metrics         # estimated tokens saved + restarts avoided
+celeborn version --check # is a newer Celeborn available?
 ```
 
-`version --check` looks back at [`cloud-dancer-labs/celeborn-code`](https://github.com/cloud-dancer-labs/celeborn-code): in a
-git checkout it compares your `HEAD` to `origin/main` (and suggests `git pull`); in a non-git install it
-compares versions. It's offline-safe (skips quietly if GitHub is unreachable), and the `CLAUDE.md` block
-reminds the agent to run it now and then.
+`version --check` looks back at the published releases and compares your installed version to the
+latest. It's offline-safe (skips quietly if GitHub is unreachable), and the `CLAUDE.md` block reminds
+the agent to run it now and then.
 
-`integrity` verifies that the installed core modules match the per-version checksum manifest shipped with
-a release — it **detects** an install that was edited in place (it doesn't prevent edits), and `doctor`
-surfaces the same status. A source/editable checkout ships no manifest, so it reports `unverified` and
-stays quiet; a released install that's been modified reports `modified` and points you back to a clean
-reinstall or a PR. The reason is the line drawn in [`CONTRACTS.md`](CONTRACTS.md): the file formats, the
-documented CLI verbs, and the hook protocol are the **stable public contract**; module internals change
-freely between versions. If you want different behavior, change it through a PR (see
-[`CONTRIBUTING.md`](CONTRIBUTING.md)) rather than editing your install.
+`integrity` verifies that the install matches its published release — it **detects** an install that
+was tampered with in place (it doesn't prevent edits), and `doctor` surfaces the same status. The
+line it protects: the file formats, the documented CLI verbs, and the hook protocol are the **stable
+public contract**; module internals change freely between versions. A modified install reports
+`modified` and points you back to a clean reinstall — and per the LICENSE Supplemental Terms,
+warranty and support cover only checksum-valid installs.
 
 (Prefer the short `celeborn` / `cel` command? That's the one-time [Install](#install) above.)
 
@@ -374,8 +366,7 @@ celeborn pr     --facet client --base main                 # DRAFT a PR (prints 
 `commit` appends `Celeborn-Task`/`-Agent`/`-Model` trailers and registers a cross-repo touch, so one
 board coordinates work across every repo. A **publish guard** hard-DENYs a release (`twine`/`npm publish`,
 `gh release create`, a tag push, …) targeting a `server:private` or `oss:*` facet — the former never
-publishes, the latter is contributed back via fork → PR. See
-[`references/product-federation.md`](references/product-federation.md).
+publishes, the latter is contributed back via fork → PR.
 
 ### Sync across devices (optional)
 
@@ -430,8 +421,7 @@ Celeborn keeps an honest running estimate in `.context/metrics.json`:
   bridged (the `PreCompact` hook fires there).
 
 `status` and `metrics` are read-only — inspecting never inflates the numbers; only the hooks (or a
-manual `celeborn record`) do. See [`references/metrics.md`](references/metrics.md) for the method and
-its caveats.
+manual `celeborn record`) do.
 
 With **hosted sync**, each `celeborn sync` also writes that project's current totals to the backend, and
 the server keeps a **per-user running total across all your projects** (the `user_savings` view, sums
@@ -446,8 +436,7 @@ orient. Since Claude Code auto-loads `CLAUDE.md`, this is the zero-config baseli
 itself even before any hooks or the skill are active. It's idempotent (re-running `init` refreshes the
 block, never duplicates it) and preserves the rest of the file; opt out with `init --no-claude-md`.
 
-For the live, per-turn behaviour, run `celeborn wire` (or merge
-[`hooks/settings.snippet.json`](hooks/settings.snippet.json) into your `.claude/settings.json`). Each
+For the live, per-turn behaviour, run `celeborn wire`. Each
 hook is a single in-process `celeborn hook <event>` command — no bash wrapper, no inline `python3`, no
 `$CELEBORN_HOME`; just have `celeborn` on PATH. The six hooks: `SessionStart` pre-hydrates the Hot
 tier, `Stop` auto-captures each turn, `UserPromptSubmit` surfaces the context reminder and the capture
@@ -514,8 +503,7 @@ Three knobs, resolved wherever `remind` is invoked:
 
 The `UserPromptSubmit` hook reads the thresholds from `.celebornrc` automatically — on Claude Code
 from the live transcript, on OpenCode from the window the session reported via `celeborn record
-tokens` (the warning rides the per-turn envelope into the TUI). Full design:
-[`references/reminders.md`](references/reminders.md).
+tokens` (the warning rides the per-turn envelope into the TUI).
 
 **Seamless clear-and-continue (OpenCode, opt-in).** On OpenCode, Celeborn can take the last step for
 you: when a session crosses the hard threshold it clears *itself* and resumes the same card, no human
@@ -540,9 +528,9 @@ or simply ignore it: your `git` push/pull keep working via your system keychain,
 
 ## Elves, included
 
-Celeborn now **bundles [Elves](https://github.com/aigorahub/elves)** (by John Ennis, MIT) under
-[`elves/`](elves/) — the autonomous multi-batch "night shift" development skill whose context-economy
-technique Celeborn grew from. The division of labour:
+Celeborn integrates **[Elves](https://github.com/aigorahub/elves)** (by John Ennis, MIT) — the
+autonomous multi-batch "night shift" development skill whose context-economy technique Celeborn grew
+from. The `/elves` skill ships with the product. The division of labour:
 
 - **Elves drives the work** — the loop, batch planning, multi-agent execution, testing, PR review.
 - **Celeborn holds the memory** — the tiered `.context/` store, bounded Hot tier, recall, rehydration.
@@ -550,9 +538,10 @@ technique Celeborn grew from. The division of labour:
 In this edition, Elves' working surfaces map straight onto Celeborn's tiers (survival guide →
 `state.md`, execution log → `journal.md`, learnings → `learnings.md`, `.ai-docs/*` → `durable/*`), and
 its **constant git pushes for state are replaced by cheap local `celeborn` checkpoints** — git/PRs are
-kept for code review only. See [`elves/CELEBORN-INTEGRATION.md`](elves/CELEBORN-INTEGRATION.md).
+kept for code review only.
 
-With deep gratitude to the Father of Elves — [`elves/GRATITUDE.md`](elves/GRATITUDE.md).
+With deep gratitude to the Father of Elves — go star
+[the original](https://github.com/aigorahub/elves).
 
 ## Grok Build
 
@@ -560,7 +549,7 @@ Celeborn also runs under **[Grok Build](https://x.ai)**. Grok has its own hook f
 `SessionStart` output to the model, so a thin adapter under [`grok/`](grok/) bridges it to the stock
 `celeborn` CLI — it converts Grok transcripts for `celeborn capture`, reads token usage for the
 reminders, and writes the Orient load to `.context/.grok-orient-pending.md` (read once per session, then
-deleted). **Celeborn core is untouched** — `grok/` is a host overlay, the same way `elves/` is a
+deleted). **Celeborn core is untouched** — `grok/` is a host overlay, the same way Elves is a
 workflow overlay. One command:
 
 ```bash
@@ -568,7 +557,7 @@ bash grok/scripts/install.sh --project /path/to/your-project
 ```
 
 Global hooks then load on every new Grok session — no manual reload (mid-session installs just need
-`/clear` once). See [`grok/SKILL.md`](grok/SKILL.md) and [`grok_handoff.md`](grok_handoff.md).
+`/clear` once). See [`grok/SKILL.md`](grok/SKILL.md).
 
 ## Standing on the shoulders of giants
 
@@ -638,11 +627,15 @@ mostly just talk to your agent; Celeborn remembers.
 
 ## Support
 
-Celeborn is **source-available under the [Business Source License 1.1](https://github.com/cloud-dancer-labs/celeborn-code/blob/main/LICENSE)** (© Cloud Dancer; distributed by Thot Technologies LLC).
-You may read, copy, and modify the source; production use of the unmodified, checksum-valid client is
-granted at no charge, and the **only** restriction is that you may not operate a competing hosted service
-built on it. Each version converts to **Apache-2.0** on its Change Date (four years after release). See
-the [LICENSE](https://github.com/cloud-dancer-labs/celeborn-code/blob/main/LICENSE) for the full terms.
+The Celeborn client ships as a **compiled binary** (all rights reserved — the license travels inside
+each release tarball). This repository — the thin installer that fetches and sha256-verifies that
+binary — is **source-available under the [Business Source License 1.1](https://github.com/cloud-dancer-labs/celeborn-code/blob/main/LICENSE)**
+(© Cloud Dancer; distributed by Thot Technologies LLC), converting to **Apache-2.0** on its Change
+Date (four years after each version's release). Releases **up to 0.2.1** shipped the full client as
+BUSL source; they remain so forever — on PyPI and in this repo's git history — and convert to
+Apache-2.0 on their own Change Dates. Production use of the unmodified, checksum-valid client is
+granted at no charge; the **only** use restriction is that you may not operate a competing hosted
+service built on it. See the [LICENSE](https://github.com/cloud-dancer-labs/celeborn-code/blob/main/LICENSE) for the full terms.
 
 It earns its keep in tokens and time. If you want to know how much, run `celeborn metrics`.
 
@@ -664,6 +657,7 @@ like). ⭐ Starring the repo and telling another developer is free, and it genui
 
 ## Status
 
-Early. See [`plan/PLAN.md`](plan/PLAN.md) for the full design and build phases. Source-available under
-the [Business Source License 1.1](https://github.com/cloud-dancer-labs/celeborn-code/blob/main/LICENSE) —
+Early and moving fast. The installer in this repository is source-available under the
+[Business Source License 1.1](https://github.com/cloud-dancer-labs/celeborn-code/blob/main/LICENSE) —
 © Cloud Dancer; distributed by Thot Technologies LLC (converts to Apache-2.0 four years after release).
+The client binary it installs is © Cloud Dancer, all rights reserved; distributed by Thot Technologies LLC.

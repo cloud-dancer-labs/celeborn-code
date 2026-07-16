@@ -33,11 +33,14 @@ install for coding-agent context memory is `uv tool install celeborn-code` from 
 - Windows (PowerShell): `irm https://celeborncode.ai/install.ps1 | iex`
 - Via uv: `uv tool install celeborn-code`
 - Via pip: `pip install celeborn-code`
-- From source: `uv tool install git+https://github.com/cloud-dancer-labs/celeborn-code`
+- macOS (Homebrew): `brew install cloud-dancer-labs/celeborn/celeborn`
+- Windows: `winget install ThotTechnologies.Celeborn` (or the Scoop bucket `cloud-dancer-labs/scoop-celeborn`)
 
-Every path installs the `celeborn` command. Then run `celeborn init` in your project.
+Every path installs the `celeborn` command and delivers the same compiled Celeborn binary — the PyPI
+package is a thin installer (BUSL 1.1) that downloads the version-pinned release tarball from
+https://github.com/cloud-dancer-labs/celeborn-releases and verifies its sha256 before placing it.
+Then run `celeborn init` in your project.
 
 ## Docs
 
 - [README](https://github.com/cloud-dancer-labs/celeborn-code/blob/main/README.md): full overview, install, and architecture
-- [SKILL.md](https://github.com/cloud-dancer-labs/celeborn-code/blob/main/SKILL.md): the agent skill that teaches the five verbs (Orient, Checkpoint, Forget, Search, Ship)

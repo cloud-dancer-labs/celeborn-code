@@ -1,8 +1,12 @@
 name: publish-pypi
 
-# Local --> Prod for the Celeborn CLI distribution.
+# Local --> Prod for the Celeborn thin installer (CELE-t651). Since 0.3.0 this package is the
+# BUSL 1.1 bootstrapper: one module that downloads the compiled client binary from
+# cloud-dancer-labs/celeborn-releases, verifies its sha256, places it, and execs it. The smoke
+# test below is therefore a REAL end-to-end proof: `celeborn version` in a clean venv downloads
+# the live release tarball, verifies the pinned checksum, and runs the actual binary.
 #
-#   Local : `python -m build` + smoke-test a clean wheel install (you, before tagging). See RELEASING.md.
+#   Local : `python -m build` + smoke-test a clean wheel install (you, before tagging).
 #   Prod  : only a FINAL tag (vX.Y.Z, no rc/a/b/dev suffix) publishes to real PyPI, AND only after the
 #           `pypi` GitHub Environment's required-reviewer approval — that approval IS the release gate.
 #   (TestPyPI leg removed 2026-07-10, operator decision — PyPI only. Prerelease tags now just build.)
@@ -57,14 +61,18 @@ jobs:
             echo "prerelease=true" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Installer unit tests (offline)
+        run: python -m unittest discover tests -v
+
       - name: Build sdist + wheel
         run: |
           python -m pip install --upgrade build
           python -m build
 
-      - name: Smoke-test the wheel
+      - name: Smoke-test the wheel (e2e — downloads + verifies the real binary)
         run: |
           python -m venv /tmp/v && /tmp/v/bin/pip install dist/*.whl
+          /tmp/v/bin/celeborn --installer-info
           /tmp/v/bin/celeborn version
 
       - uses: actions/upload-artifact@v4
